@@ -169,8 +169,8 @@
                 body: JSON.stringify(manager)
             })
             .then(response => response.json())
-            .then(() => {
-                alert("Manager added!");
+            .then(data => {
+                alert("Manager added! Id:" + data.id);
                 e.target.reset();
                 loadManagers();
             })
