@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html style="font-family: roboto">
+<head>
+    <title>Seller Login</title>
+    <link rel="icon" type="image/x-icon" href="https://thumbs.dreamstime.com/b/inventory-management-icon-monochrome-simple-sign-operation-collection-logo-templates-web-design-infographics-300229668.jpg">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1 style="text-align: center;font-family: Roboto">Seller Login</h1>
+
+    <form id="sellerLoginForm">
+        <div class="container">
+            <label for="uname" style="font-family: Roboto"><b>Username</b></label>
+            <input type="text" placeholder="Enter Username" name="uname" required>
+
+            <label for="psw" style="font-family: Roboto"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="psw" required>
+
+            <button type="submit" style="font-family: roboto;font-size: large">Login</button>
+        </div>
+
+        <div class="container" style="background-color:#f1f1f1">
+            <span class="psw"><a href="#">Forgot Password?</a></span>
+        </div>
+    </form>
+
+    <script>
+        document.getElementById("sellerLoginForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const username = document.querySelector('input[name="uname"]').value;
+            const password = document.querySelector('input[name="psw"]').value;
+
+            try {
+                const response = await fetch("https://ims-backend-au40.onrender.com/auth/loginseller", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem("sellerId", data.sellerId);
+                    localStorage.setItem("username", data.username);
+                    window.location.href = "sellerdashboard.html";
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                alert("Cannot connect to backend on localhost:8080");
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>

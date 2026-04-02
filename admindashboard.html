@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMS ADMIN</title>
+    <link rel="icon" type="image/x-icon" href="https://thumbs.dreamstime.com/b/inventory-management-icon-monochrome-simple-sign-operation-collection-logo-templates-web-design-infographics-300229668.jpg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { display: flex; height: 100vh; background: #f4f4f9; }
+        .sidebar { width: 250px; background: #2c3e50; color: white; padding: 20px 0; position: fixed; height: 100%; overflow-y: auto; transition: width 0.3s; }
+        .sidebar h3 { padding: 0 20px 20px; border-bottom: 1px solid #34495e; }
+        .sidebar ul { list-style: none; }
+        .sidebar li { padding: 15px 20px; cursor: pointer; border-left: 3px solid transparent; }
+        .sidebar li:hover, .sidebar li.active { background: #34495e; border-left-color: #3498db; }
+        .main { margin-left: 250px; flex: 1; padding: 20px; overflow-y: auto; }
+        .section { display: none; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .section.active { display: block; }
+        form { display: flex; flex-direction: column; max-width: 400px; gap: 10px; }
+        input, button, select { padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #3498db; color: white; border: none; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #ecf0f1; }
+        @media (max-width: 768px) { .sidebar { width: 200px; transform: translateX(-100%); } .main { margin-left: 0; } .sidebar.open { transform: translateX(0); } }
+        .toggle-btn { position: fixed; top: 20px; left: 20px; z-index: 1000; background: #3498db; color: white; border: none; padding: 10px; cursor: pointer; display: none; }
+        @media (max-width: 768px) { .toggle-btn { display: block; } }
+    </style>
+</head>
+<body>
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+    <nav class="sidebar" id="sidebar">
+        <h3 style="font-family: Roboto">IMS Dashboard</h3>
+        <ul>
+            <li onclick="showSection('customer')">👥 Manager Section</li>
+            <li onclick="showSection('seller')">🏪 Seller Section</li>
+            <li onclick="showSection('product')">📦 Product Section</li>
+            <li onclick="showSection('admin')">🔧 Admin Section</li>
+        </ul>
+    </nav>
+    <main class="main">
+        
+        <!-- Manager Section -->
+        <div id="customer" class="section">
+            <button type="button" onclick="loadManagers()">Refresh Managers</button><br><br>
+
+                <form onsubmit="handleManager(event)">
+                <input type="text" placeholder="Enter Manager Name" required><br>
+                <input type="email" placeholder="Enter Manager Email" required><br>
+                <input type="tel" placeholder="Enter Manager Mobile No."><br>
+                <input type="text" placeholder="Enter Manager Password" required><br>
+                <input type="text" placeholder="Enter Manager Category" required><br>
+                <input type="text" placeholder="Enter Manager Address"><br>
+                <button type="submit">Add Manager</button>
+                </form><br>
+            <table id="custTable">
+                <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Action</th></tr></thead>
+                <tbody></tbody>
+            </table><br>
+        </div>
+
+        <!-- Seller Section -->
+        <div id="seller" class="section">
+            <h2>Seller Management</h2><br>
+            <form onsubmit="handleSeller(event)">
+                <input id="sellName" placeholder="Seller Name" required>
+                <input id="sellEmail" type="email" placeholder="Seller Email" required>
+                <input id="sellPhone" placeholder="Seller Phone" >
+                <input id="sellPassword" type="password" placeholder="Seller Password" required>
+                <button type="submit">Add Seller</button><br>
+            </form>
+
+            <button type="button" onclick="loadSellers()">Refresh Sellers</button>
+
+            <table id="sellTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- New Product Section -->
+        <div id="product" class="section">
+            <h2>Product Management</h2><br>
+            <button type="button" onclick="loadProducts()">Refresh Products</button>
+            <form onsubmit="handleProduct(event); event.preventDefault();">
+                <input id="prodName" placeholder="Product Name" required>
+                <input id="prodPrice" type="number" placeholder="Price (₹)" required>
+                <input id="prodStock" type="number" placeholder="Stock Quantity" required>
+                <input id="prodCategory" placeholder="Category" required>
+                <button type="submit">Add Product</button><br>
+            </form>
+            <table id="prodTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Category</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="prodBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Admin Section -->
+        <div id="admin" class="section">
+            <h2>Admin Settings</h2><br>
+            <form onsubmit="changePassword(event); event.preventDefault();">
+                <input type="password" id="oldPass" placeholder="Old Password" required>
+                <input type="password" id="newPass" placeholder="New Password" required>
+                <button type="submit">Change Password</button>
+            </form><br>
+            <form onsubmit="changeAdmin(event); event.preventDefault();">
+                <input id="newAdminName" placeholder="New Admin Name" required>
+                <button type="submit">Change Admin</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Role-based access from login
+        const role = localStorage.getItem('role') || 'admin';
+        document.getElementById('welcome').textContent += `, ${role.charAt(0).toUpperCase() + role.slice(1)}`;
+
+        function loadManagers() {
+            fetch("https://ims-backend-au40.onrender.com/AdminDashboard/managers")
+                .then(response => response.json())
+                .then(managers => {
+                    const tbody = document.querySelector("#custTable tbody");
+
+                    tbody.innerHTML = managers.map(manager => `
+                        <tr>
+                            <td>${manager.id}</td>
+                            <td>${manager.name}</td>
+                            <td>${manager.email}</td>
+                        </tr>
+                    `).join("");
+                })
+                .catch(error => console.error("Error loading managers:", error));
+        }
+
+        function handleManager(e) {
+            e.preventDefault();
+
+            const inputs = document.querySelectorAll('#customer form input');
+
+            const manager = {
+                name: inputs[0].value,
+                email: inputs[1].value,
+                phone: inputs[2].value,
+                password: inputs[3].value,
+                category: inputs[4].value,
+                address: inputs[5].value
+            };
+
+            fetch("https://ims-backend-au40.onrender.com/AdminDashboard/managers", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(manager)
+            })
+            .then(response => response.json())
+            .then(() => {
+                alert("Manager added!");
+                e.target.reset();
+                loadManagers();
+            })
+            .catch(error => {
+                console.error("Error adding manager:", error);
+                alert("Failed to add manager");
+            });
+        }
+
+function loadManagers() {
+    fetch("https://ims-backend-au40.onrender.com/AdminDashboard/managers")
+        .then(response => response.json())
+        .then(managers => {
+            const tbody = document.querySelector("#custTable tbody");
+
+            tbody.innerHTML = managers.map(manager => `
+                <tr>
+                    <td>${manager.id}</td>
+                    <td>${manager.name}</td>
+                    <td>${manager.email}</td>
+                </tr>
+            `).join('');
+        })
+        .catch(error => {
+            console.error("Error loading managers:", error);
+        });
+}
+
+window.onload = function () {
+    showSection('product');
+    loadProducts();
+    loadManagers();
+};
+
+        function loadManagers() {
+            fetch("https://ims-backend-au40.onrender.com/AdminDashboard/managers")
+                .then(response => response.json())
+                .then(managers => {
+                    const tbody = document.querySelector("#custTable tbody");
+
+                    tbody.innerHTML = managers.map(manager => `
+                        <tr>
+                            <td>${manager.id}</td>
+                            <td>${manager.name}</td>
+                            <td>${manager.email}</td>
+                            <td>
+                                <button onclick="deleteManager(${manager.id})">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    `).join("");
+                });
+        }
+        
+        // Show section (updated for 4 sections)
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.sidebar li').forEach((li, i) => li.classList.toggle('active', ['customer','seller','product','admin'].indexOf(sectionId) === i));
+        }
+        showSection('product');
+        // Customer functions (localStorage demo)
+        let customers = JSON.parse(localStorage.getItem('customers')) || [];
+        function handleCustomer(e) {
+            const name = document.getElementById('custName').value;
+            const id = document.getElementById('custId').value;
+            customers.push({id, name});
+            localStorage.setItem('customers', JSON.stringify(customers));
+            updateCustTable();
+            e.target.reset();
+            alert('Customer added!');
+        }
+        function updateCustTable() {
+            const tbody = document.querySelector('#custTable tbody');
+            tbody.innerHTML = customers.map(c => `<tr><td>${c.id}</td><td>${c.name}</td></tr>`).join('');
+        }
+        function removeCustomer() {
+            const id = prompt('Enter Customer ID to remove:');
+            customers = customers.filter(c => c.id !== id);
+            localStorage.setItem('customers', JSON.stringify(customers));
+            updateCustTable();
+        }
+        function printCustomers() {
+            window.print();
+        }
+        updateCustTable();
+
+        // Seller functions
+        function handleSeller(e) {
+            e.preventDefault();
+
+            const seller = {
+                name: document.getElementById("sellName").value,
+                email: document.getElementById("sellEmail").value,
+                phone: document.getElementById("sellPhone").value,
+                password: document.getElementById("sellPassword").value
+            };
+
+            fetch("https://ims-backend-au40.onrender.com/AdminDashboard/sellers", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(seller)
+            })
+            .then(response => response.json())
+            .then(() => {
+                alert("Seller added!");
+                e.target.reset();
+                loadSellers();
+            })
+            .catch(error => {
+                console.error("Error adding seller:", error);
+                alert("Failed to add seller");
+            });
+        }
+
+        function loadSellers() {
+            fetch("https://ims-backend-au40.onrender.com/AdminDashboard/sellers")
+                .then(response => response.json())
+                .then(sellers => {
+                    const tbody = document.querySelector("#sellTable tbody");
+
+                    tbody.innerHTML = sellers.map(seller => `
+                        <tr>
+                            <td>${seller.id}</td>
+                            <td>${seller.name}</td>
+                            <td>${seller.email}</td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(error => {
+                    console.error("Error loading sellers:", error);
+                });
+        }
+
+        // New Product functions
+        function handleProduct(e) {
+            e.preventDefault();
+
+            const product = {
+                productName: document.getElementById('prodName').value,
+                price: parseFloat(document.getElementById('prodPrice').value),
+                stock: parseInt(document.getElementById('prodStock').value),
+                category: document.getElementById('prodCategory').value
+            };
+
+            fetch("https://ims-backend-au40.onrender.com/AdminDashboard/products", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(product)
+            })
+            .then(response => response.json())
+            .then(() => {
+                alert("Product added!");
+                e.target.reset();
+                loadProducts();
+            });
+        }
+
+        function loadProducts() {
+            fetch("https://ims-backend-au40.onrender.com/AdminDashboard/products")
+                .then(response => response.json())
+                .then(products => {
+                    const tbody = document.getElementById('prodBody');
+
+                    tbody.innerHTML = products.map(product => `
+                        <tr>
+                            <td>${product.productName}</td>
+                            <td>₹${product.price}</td>
+                            <td>${product.stock}</td>
+                            <td>${product.category}</td>
+                            <td>
+                                <button onclick="deleteProduct(${product.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                });
+        }
+
+        function deleteProduct(id) {
+            fetch(`https://ims-backend-au40.onrender.com/AdminDashboard/products/${id}`, {
+                method: "DELETE"
+            })
+            .then(() => loadProducts());
+        }
+window.onload = function () {
+    showSection('product');
+    loadProducts();
+};
+
+        // Admin functions
+function changePassword(e) {
+    e.preventDefault();
+
+    const oldPassword = document.getElementById("oldPass").value;
+    const newPassword = document.getElementById("newPass").value;
+    const id = localStorage.getItem("adminId");
+    fetch(`https://ims-backend-au40.onrender.com/AdminDashboard/changePassword`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            id: localStorage.getItem("adminId"),
+            oldPassword: oldPassword,
+            newPassword: newPassword
+        })
+    })
+    .then(async response => {
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(data.message || "Password changed successfully!");
+            e.target.reset();
+        } else {
+            alert(data.message || "Failed to change password");
+        }
+    })
+    .catch(error => {
+        console.error("Error changing password:", error);
+        alert("Could not connect to backend");
+    });
+}
+        function changeAdmin(e) {
+            alert('Admin changed! (Connect to backend)');
+            e.target.reset();
+        }
+
+        // Mobile toggle
+        function changeAdmin(e) {
+            e.preventDefault();
+
+            const newAdminName = document.getElementById("newAdminName").value;
+
+            fetch("https://ims-backend-au40.onrender.com/AdminDashboard/changeName", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: localStorage.getItem("adminId"),
+                    name: newAdminName
+                })
+            })
+            .then(async response => {
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    alert(data.message || "Admin name changed successfully!");
+                    localStorage.setItem("username", newAdminName);
+                    e.target.reset();
+                } else {
+                    alert(data.message || "Failed to change admin name");
+                }
+            })
+            .catch(error => {
+                console.error("Error changing admin name:", error);
+                alert("Could not connect to backend");
+            });
+        }
+        function deleteManager(id) {
+            if (!confirm("Delete this manager?")) return;
+
+            fetch(`https://ims-backend-au40.onrender.com/AdminDashboard/managers/${id}`, {
+                method: "DELETE"
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Manager deleted!");
+                    loadManagers();
+                } else {
+                    alert("Failed to delete manager");
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting manager:", error);
+                alert("Could not connect to backend");
+            });
+        }
+    </script>
+</body>
+</html>

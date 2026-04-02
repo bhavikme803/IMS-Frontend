@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard - IMS</title>
+    <link rel="icon" type="image/x-icon" href="https://thumbs.dreamstime.com/b/inventory-management-icon-monochrome-simple-sign-operation-collection-logo-templates-web-design-infographics-300229668.jpg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background: #f4f4f9;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #e67e22;
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            transition: 0.3s;
+        }
+
+        .sidebar h3 {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #f39c12;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar li:hover,
+        .sidebar li.active {
+            background: #f39c12;
+            border-left-color: #fff;
+        }
+
+        .main {
+            margin-left: 250px;
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            gap: 10px;
+        }
+
+        input, button, select, textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background: #e67e22;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #d35400;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #ecf0f1;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            max-width: 500px;
+            line-height: 2;
+        }
+
+        .toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 220px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                padding-top: 70px;
+            }
+
+            .toggle-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
+    <nav class="sidebar" id="sidebar">
+        <h3>Seller Dashboard</h3>
+        <ul>
+            <li onclick="showSection('product')" class="active">Product Section</li>
+            <li onclick="showSection('info')">Info Section</li>
+            <li onclick="showSection('profile')">Profile Section</li>
+            <li onclick="showSection('orders')">Orders</li>
+        </ul>
+    </nav>
+
+    <main class="main">
+        <h1 id="welcome">Welcome</h1>
+        <br>
+
+        <div id="product" class="section active">
+            <h2>Product Requests</h2>
+            <br>
+            <button type="button" onclick="loadSoldProducts()">Refresh Products</button>
+
+            <table id="soldProductsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Qty Sold</th>
+                        <th>Date</th>
+                        <th>Acceptance</th>
+                    </tr>
+                </thead>
+                <tbody id="soldProductsTbody"></tbody>
+            </table>
+        </div>
+
+        <div id="info" class="section">
+            <h2>Admin Information</h2>
+            <div class="info-card">
+                <p><strong>Admin Id:</strong> <span id="adminName"></span></p>
+                <p><strong>Location:</strong> <span id="adminLocation"></span></p>
+                <p><strong>Phone:</strong> <span id="adminPhone"></span></p>
+            </div>
+            <button onclick="contactAdmin()">Contact Admin</button>
+        </div>
+
+        <div id="profile" class="section">
+            <h2>Seller Profile</h2>
+            <div class="info-card">
+                <p><strong>Id:</strong> <span id="sellerName"></span></p>
+                <p><strong>Email:</strong> <span id="sellerEmail"></span></p>
+                <p><strong>Phone:</strong> <span id="sellerPhone"></span></p>
+                <p><strong>Name:</strong> <span id="sellerShop"></span></p>
+            </div>
+            <br>
+            <form onsubmit="changePassword(event)">
+                <input type="password" id="oldPass" placeholder="Old Password" required>
+                <input type="password" id="newPass" placeholder="New Password" required>
+                <button type="submit">Change Password</button>
+            </form>
+        </div>
+
+        <div id="orders" class="section">
+            <h2>Your Sales Orders</h2>
+            <br>
+            <button type="button" onclick="loadOrders()">Refresh Orders</button>
+
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTbody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById("welcome").textContent =
+            (localStorage.getItem("username") || "Seller") + " Dashboard";
+
+        function showSection(sectionId) {
+            document.querySelectorAll(".section").forEach(section => {
+                section.classList.remove("active");
+            });
+
+            document.getElementById(sectionId).classList.add("active");
+
+            document.querySelectorAll(".sidebar li").forEach((li, index) => {
+                li.classList.toggle("active", ["product", "info", "profile", "orders"].indexOf(sectionId) === index);
+            });
+        }
+
+        function loadSoldProducts() {
+            const sellerId = localStorage.getItem("sellerId");
+
+            fetch(`https://ims-backend-au40.onrender.com/SellerDashboard/products/${sellerId}`)
+                .then(response => response.json())
+                .then(products => {
+                    const tbody = document.getElementById("soldProductsTbody");
+                    tbody.innerHTML = products.map(product => `
+                        <tr>
+                            <td>${product.name}</td>
+                            <td>${product.qty}</td>
+                            <td>${product.date}</td>
+                            <td>${product.acceptance || "Pending"}</td>
+                        </tr>
+                    `).join("");
+                })
+                .catch(error => {
+                    console.error("Error loading seller products:", error);
+                    alert("Failed to load products");
+                });
+        }
+
+        function loadAdminInfo() {
+            fetch("https://ims-backend-au40.onrender.com/SellerDashboard/adminInfo")
+                .then(response => response.json())
+                .then(admin => {
+                    document.getElementById("adminName").textContent = admin.name || "";
+                    document.getElementById("adminLocation").textContent = admin.location || "";
+                    document.getElementById("adminPhone").textContent = admin.phone || "";
+                })
+                .catch(error => {
+                    console.error("Error loading admin info:", error);
+                    alert("Failed to load admin information");
+                });
+        }
+
+        function contactAdmin() {
+            const adminPhone = document.getElementById("adminPhone").textContent;
+            alert("Contact Admin: " + adminPhone);
+        }
+
+        function loadProfile() {
+            const sellerId = localStorage.getItem("sellerId");
+
+            fetch(`https://ims-backend-au40.onrender.com/SellerDashboard/profile/${sellerId}`)
+                .then(response => response.json())
+                .then(seller => {
+                    document.getElementById("sellerName").textContent = seller.name || "";
+                    document.getElementById("sellerEmail").textContent = seller.email || "";
+                    document.getElementById("sellerPhone").textContent = seller.phone || "";
+                    document.getElementById("sellerShop").textContent = seller.shop || "";
+                })
+                .catch(error => {
+                    console.error("Error loading seller profile:", error);
+                    alert("Failed to load profile");
+                });
+        }
+
+        function changePassword(e) {
+            e.preventDefault();
+
+            const oldPassword = document.getElementById("oldPass").value;
+            const newPassword = document.getElementById("newPass").value;
+
+            fetch("https://ims-backend-au40.onrender.com/SellerDashboard/changePassword", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: localStorage.getItem("sellerId"),
+                    oldPassword: oldPassword,
+                    newPassword: newPassword
+                })
+            })
+            .then(async response => {
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message || "Password changed successfully!");
+                    e.target.reset();
+                } else {
+                    alert(data.message || "Failed to change password");
+                }
+            })
+            .catch(error => {
+                console.error("Error changing password:", error);
+                alert("Could not connect to backend");
+            });
+        }
+
+        function loadOrders() {
+            const sellerId = localStorage.getItem("sellerId");
+
+            fetch(`https://ims-backend-au40.onrender.com/SellerDashboard/orders/${sellerId}`)
+                .then(response => response.json())
+                .then(orders => {
+                    const tbody = document.getElementById("ordersTbody");
+                    tbody.innerHTML = orders.map(order => `
+                        <tr>
+                            <td>${order.id}</td>
+                            <td>${order.customer}</td>
+                            <td>${order.product}</td>
+                            <td>${order.qty}</td>
+                            <td>${order.status}</td>
+                        </tr>
+                    `).join("");
+                })
+                .catch(error => {
+                    console.error("Error loading orders:", error);
+                    alert("Failed to load orders");
+                });
+        }
+
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("open");
+        }
+
+        window.onload = function () {
+            showSection("product");
+            loadAdminInfo();
+            loadProfile();
+        };
+    </script>
+</body>
+</html>

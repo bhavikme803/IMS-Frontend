@@ -1,0 +1,297 @@
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 0;
+            color: #2d3748;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        h1 {
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        #y {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            gap: 25px;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px 40px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        
+        #x {
+            flex: 1;
+            min-width: 280px;
+            max-width: 360px;
+            border-radius: 12px;
+            background: #ffffff;
+            padding: 35px 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible; /* Changed to visible to show buttons */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            min-height: 180px;
+        }
+        
+        #x::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4299e1, #48bb78, #ed8936);
+            z-index: 2;
+        }
+        
+        #x:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        h2 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        /* Ensure buttons are always visible and styled properly */
+        button {
+            font-size: 1.15rem !important;
+            font-weight: 600 !important;
+            border-radius: 12px !important;
+            padding: 16px 32px !important;
+            border: none !important;
+            cursor: pointer !important;
+            width: 100% !important;
+            max-width: 220px !important;
+            font-family: 'Roboto', sans-serif !important;
+            transition: all 0.3s ease !important;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4) !important;
+            display: block !important;
+            margin: 0 !important;
+            position: relative !important;
+            z-index: 1 !important;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 20px rgba(66, 153, 225, 0.5) !important;
+        }
+        
+        /* Override any inline styles or external CSS */
+        button[style] {
+            font-size: 1.15rem !important;
+            border-radius: 12px !important;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+        }
+        
+        br {
+            display: none; /* Remove extra spacing from br tags */
+        }
+        
+        @media (max-width: 1024px) {
+            #y {
+                flex-direction: column;
+                padding: 40px 20px 40px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 { 
+                font-size: 2.2rem; 
+                padding: 20px 15px;
+            }
+            #x { 
+                padding: 25px 20px; 
+                min-width: 100%;
+                max-width: 100%;
+                min-height: 160px;
+            }
+            button { 
+                padding: 14px 28px !important; 
+                font-size: 1.1rem !important;
+                max-width: 100% !important;
+            }
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Roboto, sans-serif;
+            background: #f5f7fb;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #1f2937;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: Roboto, sans-serif;
+            font-size: 2.3rem;
+            margin-bottom: 28px;
+            color: #1e293b;
+            letter-spacing: 0.5px;
+        }
+
+        form {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 32px 28px;
+            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            font-size: 0.98rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px 15px;
+            margin-bottom: 18px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            outline: none;
+            font-size: 1rem;
+            background: #f8fafc;
+            transition: all 0.25s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: #2563eb;
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s ease;
+            margin-top: 8px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);
+        }
+
+        label input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            accent-color: #2563eb;
+        }
+
+        .container label:last-child {
+            display: flex;
+            align-items: center;
+            margin-top: 16px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .container[style] {
+            background: transparent !important;
+            margin-top: 16px;
+            padding-top: 6px;
+            text-align: right;
+        }
+
+        .psw a {
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .psw a:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.9rem;
+                margin-bottom: 22px;
+            }
+
+            form {
+                padding: 24px 18px;
+                border-radius: 14px;
+            }
+
+            input[type="text"],
+            input[type="password"] {
+                padding: 12px 13px;
+            }
+
+            button {
+                padding: 13px;
+            }
+        }

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard - IMS</title>
+    <link rel="icon" type="image/x-icon" href="https://thumbs.dreamstime.com/b/inventory-management-icon-monochrome-simple-sign-operation-collection-logo-templates-web-design-infographics-300229668.jpg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background: #f4f4f9;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #27ae60;
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            transition: 0.3s;
+        }
+
+        .sidebar h3 {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #2ecc71;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar li:hover,
+        .sidebar li.active {
+            background: #2ecc71;
+            border-left-color: #fff;
+        }
+
+        .main {
+            margin-left: 250px;
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            gap: 10px;
+        }
+
+        input, button, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #229954;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #ecf0f1;
+        }
+
+        .search-box {
+            max-width: 300px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .profile-card {
+            max-width: 500px;
+            line-height: 2;
+        }
+
+        .toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 220px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                padding-top: 70px;
+            }
+
+            .toggle-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
+    <nav class="sidebar" id="sidebar">
+        <h3>Manager Dashboard</h3>
+        <ul>
+            <li onclick="showSection('product')" class="active">Product Section</li>
+            <li onclick="showSection('account')">Account Section</li>
+            <li onclick="showSection('profile')">Profile</li>
+        </ul>
+    </nav>
+
+    <main class="main">
+        <h1 id="welcome">Welcome</h1>
+        <br>
+
+        <div id="product" class="section active">
+            <h2>Product Management</h2>
+            <br>
+            <button type="button" onclick="loadProducts()">Refresh Products</button>
+
+            <div class="search-box">
+                <input type="text" id="searchProduct" placeholder="Search product by name..." oninput="filterProducts()">
+            </div>
+
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Category</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="productTbody"></tbody>
+            </table>
+        </div>
+
+        <div id="account" class="section">
+            <h2>Account Settings</h2>
+            <br>
+            <form onsubmit="changePassword(event)">
+                <input type="password" id="oldPass" placeholder="Old Password" required>
+                <input type="password" id="newPass" placeholder="New Password" required>
+                <input type="password" id="confirmPass" placeholder="Confirm New Password" required>
+                <button type="submit">Change Password</button>
+            </form>
+        </div>
+
+        <div id="profile" class="section">
+            <h2>Profile</h2>
+            <br>
+            <div class="profile-card">
+                <p><strong>Name:</strong> <span id="custName"></span></p>
+                <p><strong>Email:</strong> <span id="custEmail"></span></p>
+                <p><strong>Phone:</strong> <span id="custPhone"></span></p>
+                <br>
+                <button onclick="editProfile()">Edit Profile</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let allProducts = [];
+
+        document.getElementById("welcome").textContent =
+            (localStorage.getItem("username") || "Manager") + " Dashboard";
+
+        function showSection(sectionId) {
+            document.querySelectorAll(".section").forEach(section => {
+                section.classList.remove("active");
+            });
+
+            document.getElementById(sectionId).classList.add("active");
+
+            document.querySelectorAll(".sidebar li").forEach((li, index) => {
+                li.classList.toggle("active", ["product", "account", "profile"].indexOf(sectionId) === index);
+            });
+        }
+
+        function loadProducts() {
+            fetch("https://ims-backend-au40.onrender.com/ManagerDashboard/products")
+                .then(response => response.json())
+                .then(products => {
+                    allProducts = products;
+                    renderProducts(products);
+                })
+                .catch(error => {
+                    console.error("Error loading products:", error);
+                    alert("Failed to load products");
+                });
+        }
+
+        function renderProducts(products) {
+            const tbody = document.getElementById("productTbody");
+
+            tbody.innerHTML = products.map(product => `
+                <tr>
+                    <td>${product.productName}</td>
+                    <td>${product.price}</td>
+                    <td>${product.stock}</td>
+                    <td>${product.category}</td>
+                    <td><button onclick="viewProduct('${product.productName}')">View</button></td>
+                </tr>
+            `).join("");
+        }
+
+        function filterProducts() {
+            const query = document.getElementById("searchProduct").value.toLowerCase();
+
+            const filteredProducts = allProducts.filter(product =>
+                product.productName.toLowerCase().includes(query)
+            );
+
+            renderProducts(filteredProducts);
+        }
+
+        function viewProduct(name) {
+            alert(name + " selected");
+        }
+        console.log(localStorage.getItem("managerId"));
+        console.log(localStorage.getItem("username"));
+        function loadProfile() {
+            const managerId = localStorage.getItem("managerId");
+
+            fetch(`https://ims-backend-au40.onrender.com/ManagerDashboard/profile/${managerId}`)
+                .then(response => response.json())
+                .then(manager => {
+                    document.getElementById("custName").textContent = manager.name || "";
+                    document.getElementById("custEmail").textContent = manager.email || "";
+                    document.getElementById("custPhone").textContent = manager.phone || "";
+                })
+                .catch(error => {
+                    console.error("Error loading profile:", error);
+                    alert("Failed to load profile");
+                });
+        }
+
+        function changePassword(e) {
+            e.preventDefault();
+
+            const oldPassword = document.getElementById("oldPass").value;
+            const newPassword = document.getElementById("newPass").value;
+            const confirmPass = document.getElementById("confirmPass").value;
+
+            if (newPassword !== confirmPass) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            fetch("https://ims-backend-au40.onrender.com/ManagerDashboard/changePassword", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: localStorage.getItem("managerId"),
+                    oldPassword: oldPassword,
+                    newPassword: newPassword
+                })
+            })
+            .then(async response => {
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message || "Password changed successfully!");
+                    e.target.reset();
+                } else {
+                    alert(data.message || "Failed to change password");
+                }
+            })
+            .catch(error => {
+                console.error("Error changing password:", error);
+                alert("Could not connect to backend");
+            });
+        }
+
+        function editProfile() {
+            const managerId = localStorage.getItem("managerId");
+            const currentName = document.getElementById("custName").textContent;
+            const currentEmail = document.getElementById("custEmail").textContent;
+            const currentPhone = document.getElementById("custPhone").textContent;
+
+            const name = prompt("Enter new name", currentName);
+            const email = prompt("Enter new email", currentEmail);
+            const phone = prompt("Enter new phone", currentPhone);
+
+            if (!name || !email || !phone) return;
+
+            fetch("https://ims-backend-au40.onrender.com/ManagerDashboard/updateProfile", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: managerId,
+                    name: name,
+                    email: email,
+                    phone: phone
+                })
+            })
+            .then(async response => {
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById("custName").textContent = name;
+                    document.getElementById("custEmail").textContent = email;
+                    document.getElementById("custPhone").textContent = phone;
+                    localStorage.setItem("username", name);
+                    document.getElementById("welcome").textContent = name + " Dashboard";
+                    alert(data.message || "Profile updated successfully!");
+                } else {
+                    alert(data.message || "Failed to update profile");
+                }
+            })
+            .catch(error => {
+                console.error("Error updating profile:", error);
+                alert("Could not connect to backend");
+            });
+        }
+
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("open");
+        }
+
+        window.onload = function () {
+            showSection("product");
+            loadProfile();
+        };
+    </script>
+</body>
+</html>
