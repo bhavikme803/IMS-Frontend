@@ -278,8 +278,8 @@ window.onload = function () {
                 body: JSON.stringify(seller)
             })
             .then(response => response.json())
-            .then(() => {
-                alert("Seller added!");
+            .then(data => {
+                alert("Seller added! Id: " + data.sellerId);
                 e.target.reset();
                 loadSellers();
             })
