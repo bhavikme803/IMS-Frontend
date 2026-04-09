@@ -58,7 +58,7 @@
         <input type="text" id="ProductCategory" placeholder="Category" required>
         <br><br>
 
-        <button type="submit" onclick="EditProduct(id)">Edit Product</button>
+        <button type="submit" onclick="EditProduct(id,event)">Edit Product</button>
         <button onclick="closeRequestModal()">Cancel</button>
     </form>
     </div>
@@ -363,7 +363,8 @@ window.onload = function () {
                 });
         }
 
-        function EditProduct() {
+        function EditProduct(event) {
+            event.preventDefault();
                     const productName = document.getElementById("ProductName").value;
                     const price = document.getElementById("ProductPrice").value;
                     const stock = document.getElementById("ProductQuantity").value;
