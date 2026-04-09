@@ -338,7 +338,7 @@ window.onload = function () {
             })
             .then(response => response.json())
             .then(() => {
-                alert("Product added!");
+                alert(response.message);
                 e.target.reset();
                 loadProducts();
             });
