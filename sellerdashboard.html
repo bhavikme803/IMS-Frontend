@@ -180,6 +180,7 @@
             <table id="soldProductsTable">
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Name</th>
                         <th>Qty Sold</th>
                         <th>Date</th>
@@ -264,6 +265,7 @@
                     const tbody = document.getElementById("soldProductsTbody");
                     tbody.innerHTML = products.map(product => `
                         <tr>
+                            <td>${product.id}</td>
                             <td>${product.name}</td>
                             <td>${product.qty}</td>
                             <td>${product.date}</td>

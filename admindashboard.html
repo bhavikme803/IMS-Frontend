@@ -49,10 +49,10 @@
         <input type="text" id="ProductName" placeholder="Product Name" required>
         <br><br>
 
-        <input type="number" id="ProductPrice" placeholder="Price" required>
+        <input type="number" id="ProductPrice" placeholder="Price" min="0"  required >
         <br><br>
 
-        <input type="number" id="ProductQuantity" placeholder="Stock" required>
+        <input type="number" id="ProductQuantity" placeholder="Stock" min="1" required>
         <br><br>
 
         <input type="text" id="ProductCategory" placeholder="Category" required>
@@ -124,6 +124,7 @@
             <table id="prodTable">
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Name</th>
                         <th>Price</th>
                         <th>Stock</th>
@@ -351,6 +352,7 @@ window.onload = function () {
 
                     tbody.innerHTML = products.map(product => `
                         <tr>
+                            <td>${product.id}</td>
                             <td>${product.productName}</td>
                             <td>₹${product.price}</td>
                             <td>${product.stock}</td>

@@ -171,20 +171,22 @@
 
     <div id="requestModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);">
     <div style="background:white; width:350px; margin:100px auto; padding:20px; border-radius:10px;">
+        <form>
         <h2>Create Stock Request</h2>
         <br>
 
-        <input type="number" id="sellerId" placeholder="Seller ID">
+        <input type="number" id="sellerId" placeholder="Seller ID" min="0" required>
         <br><br>
 
-        <input type="number" id="productId" placeholder="Product ID">
+        <input type="number" id="productId" placeholder="Product ID" min="0" required>
         <br><br>
 
-        <input type="number" id="requestQuantity" placeholder="Quantity">
+        <input type="number" id="requestQuantity" placeholder="Quantity" min="1" required>
         <br><br>
 
-        <button onclick="createStockRequest()">Send Request</button>
+        <button type="submit"     onclick="createStockRequest(event)">Send Request</button>
         <button onclick="closeRequestModal()">Cancel</button>
+    </form>
     </div>
         </div>
 
@@ -208,6 +210,7 @@
             <table id="productTable">
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Name</th>
                         <th>Price</th>
                         <th>Stock</th>
@@ -282,6 +285,7 @@
 
             tbody.innerHTML = products.map(product => `
                 <tr>
+                    <td>${product.id}</td>
                     <td>${product.productName}</td>
                     <td>${product.price}</td>
                     <td>${product.stock}</td>
@@ -423,6 +427,7 @@
                 }
 
                 function createStockRequest() {
+                    event.preventDefault();
                     const sellerId = document.getElementById("sellerId").value;
                     const productId = document.getElementById("productId").value;
                     const quantity = document.getElementById("requestQuantity").value;
