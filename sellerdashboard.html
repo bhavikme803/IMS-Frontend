@@ -347,27 +347,75 @@
         }
 
         function loadOrders() {
-            const sellerId = localStorage.getItem("sellerId");
+    const sellerId = localStorage.getItem("sellerId");
 
-            fetch(`https://ims-backend-au40.onrender.com/SellerDashboard/orders/${sellerId}`)
-                .then(response => response.json())
-                .then(orders => {
-                    const tbody = document.getElementById("ordersTbody");
-                    tbody.innerHTML = orders.map(order => `
-                        <tr>
-                            <td>${order.id}</td>
-                            <td>${order.manager.id}</td>
-                            <td>${order.product.id}</td>
-                            <td>${order.requestedQuantity}</td>
-                            <td>${order.status}</td>
-                        </tr>
-                    `).join("");
-                })
-                .catch(error => {
-                    console.error("Error loading orders:", error);
-                    alert("Failed to load orders");
-                });
+    fetch(`https://ims-backend-au40.onrender.com/SellerDashboard/orders/${sellerId}`)
+        .then(response => response.json())
+        .then(orders => {
+            const tbody = document.getElementById("ordersTbody");
+
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${order.manager.id}</td>
+                    <td>${order.product.id}</td>
+                    <td>${order.requestedQuantity}</td>
+                    <td>
+                        ${
+                            order.status === "PENDING"
+                            ? `
+                                <button onclick="acceptOrder(${order.id})">Accept</button>
+                                <button onclick="rejectOrder(${order.id})" style="background:#e74c3c; margin-left:5px;">
+                                    Reject
+                                </button>
+                              `
+                            : order.status
+                        }
+                    </td>
+                </tr>
+            `).join("");
+        })
+        .catch(error => {
+            console.error("Error loading orders:", error);
+            alert("Failed to load orders");
+        });
+}
+
+        function acceptOrder(orderId) {
+    fetch(`https://ims-backend-au40.onrender.com/SellerDashboard/request/${orderId}/accept`, {
+        method: "PUT"
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to accept order");
         }
+
+        alert("Order accepted!");
+        loadOrders();
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Could not accept order");
+    });
+}
+
+function rejectOrder(orderId) {
+    fetch(`https://ims-backend-au40.onrender.com/SellerDashboard/request/${orderId}/reject`, {
+        method: "PUT"
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to reject order");
+        }
+
+        alert("Order rejected!");
+        loadOrders();
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Could not reject order");
+    });
+}
 
         function toggleSidebar() {
             document.getElementById("sidebar").classList.toggle("open");
