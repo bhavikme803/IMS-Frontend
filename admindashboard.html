@@ -374,10 +374,10 @@ window.onload = function () {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            managerId: managerId,
-                            sellerId: sellerId,
-                            productId: productId,
-                            quantity: quantity
+                            productName: productName,
+                            price: price,
+                            stock: stock,
+                            category: category
                         })
                     })
                     .then(async response => {
