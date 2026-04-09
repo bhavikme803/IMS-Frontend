@@ -52,6 +52,7 @@
         <br><br>
 
         <input type="number" id="ProductQuantity" placeholder="Stock">
+        <br><br>
 
         <input type="text" id="ProductCategory" placeholder="Category">
         <br><br>
@@ -360,11 +361,12 @@ window.onload = function () {
                 });
         }
 
-        function EditProduct(id) {
+        function EditProduct() {
                     const productName = document.getElementById("ProductName").value;
                     const price = document.getElementById("ProductPrice").value;
                     const stock = document.getElementById("ProductQuantity").value;
                     const category = document.getElementById("ProductCategory").value;
+                    const id = localStorage.getItem("ProductId");
 
                     fetch(`https://ims-backend-au40.onrender.com/AdminDashboard/products/${id}`, {
                         method: "PUT",
@@ -431,10 +433,7 @@ function changePassword(e) {
         alert("Could not connect to backend");
     });
 }
-        function changeAdmin(e) {
-            alert('Admin changed! (Connect to backend)');
-            e.target.reset();
-        }
+
 
         // Mobile toggle
         function changeAdmin(e) {
@@ -487,9 +486,10 @@ function changePassword(e) {
                 alert("Could not connect to backend");
             });
         }
-          function openRequestModal(id) {
-                    document.getElementById("requestModal").style.display = "block";
-                }
+        function openRequestModal(id) {
+            localStorage.setItem("ProductId", id);
+            document.getElementById("requestModal").style.display = "block";
+        }
 
                 function closeRequestModal() {
                     document.getElementById("requestModal").style.display = "none";
