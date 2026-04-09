@@ -39,6 +39,26 @@
             <li onclick="showSection('admin')">🔧 Admin Section</li>
         </ul>
     </nav>
+
+    <div id="requestModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);">
+    <div style="background:white; width:350px; margin:100px auto; padding:20px; border-radius:10px;">
+        <h2>Edit Product</h2>
+        <br>
+
+        <input type="number" id="ProductName" placeholder="Seller ID">
+        <br><br>
+
+        <input type="number" id="productId" placeholder="Product ID">
+        <br><br>
+
+        <input type="number" id="Edit Quantity" placeholder="Quantity">
+        <br><br>
+
+        <button onclick="EditProduct(id)">Edit Product</button>
+        <button onclick="closeRequestModal()">Cancel</button>
+    </div>
+        </div>
+
     <main class="main">
         
         <!-- Manager Section -->
@@ -349,16 +369,16 @@ window.onload = function () {
                             <td>${product.stock}</td>
                             <td>${product.category}</td>
                             <td>
-                                <button onclick="deleteProduct(${product.id})">Delete</button>
+                                <button onclick="openRequestModal()">Edit</button>
                             </td>
                         </tr>
                     `).join('');
                 });
         }
 
-        function deleteProduct(id) {
+        function EditProduct(id) {
             fetch(`https://ims-backend-au40.onrender.com/AdminDashboard/products/${id}`, {
-                method: "DELETE"
+                method: "PUT"
             })
             .then(() => loadProducts());
         }
@@ -456,6 +476,13 @@ function changePassword(e) {
                 alert("Could not connect to backend");
             });
         }
+          function openRequestModal() {
+                    document.getElementById("requestModal").style.display = "block";
+                }
+
+                function closeRequestModal() {
+                    document.getElementById("requestModal").style.display = "none";
+                }
     </script>
 </body>
 </html>
