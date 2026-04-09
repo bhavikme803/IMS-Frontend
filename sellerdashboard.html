@@ -228,8 +228,8 @@
                 <thead>
                     <tr>
                         <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Product</th>
+                        <th>Manager ID</th>
+                        <th>Product ID</th>
                         <th>Qty</th>
                         <th>Status</th>
                     </tr>
@@ -356,9 +356,9 @@
                     tbody.innerHTML = orders.map(order => `
                         <tr>
                             <td>${order.id}</td>
-                            <td>${order.customer}</td>
-                            <td>${order.product}</td>
-                            <td>${order.qty}</td>
+                            <td>${order.manager.id}</td>
+                            <td>${order.product.id}</td>
+                            <td>${order.requestedQuantity}</td>
                             <td>${order.status}</td>
                         </tr>
                     `).join("");
