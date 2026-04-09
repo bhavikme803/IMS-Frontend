@@ -45,13 +45,15 @@
         <h2>Edit Product</h2>
         <br>
 
-        <input type="number" id="ProductName" placeholder="Seller ID">
+        <input type="text" id="ProductName" placeholder="Product Name">
         <br><br>
 
-        <input type="number" id="productId" placeholder="Product ID">
+        <input type="number" id="ProductPrice" placeholder="Price">
         <br><br>
 
-        <input type="number" id="Edit Quantity" placeholder="Quantity">
+        <input type="number" id="ProductQuantity" placeholder="Stock">
+
+        <input type="text" id="ProductCategory" placeholder="Category">
         <br><br>
 
         <button onclick="EditProduct(id)">Edit Product</button>
@@ -202,24 +204,6 @@
             });
         }
 
-function loadManagers() {
-    fetch("https://ims-backend-au40.onrender.com/AdminDashboard/managers")
-        .then(response => response.json())
-        .then(managers => {
-            const tbody = document.querySelector("#custTable tbody");
-
-            tbody.innerHTML = managers.map(manager => `
-                <tr>
-                    <td>${manager.id}</td>
-                    <td>${manager.name}</td>
-                    <td>${manager.email}</td>
-                </tr>
-            `).join('');
-        })
-        .catch(error => {
-            console.error("Error loading managers:", error);
-        });
-}
 
 window.onload = function () {
     showSection('product');
@@ -369,7 +353,7 @@ window.onload = function () {
                             <td>${product.stock}</td>
                             <td>${product.category}</td>
                             <td>
-                                <button onclick="openRequestModal()">Edit</button>
+                                <button onclick="openRequestModal(${product.id})">Edit</button>
                             </td>
                         </tr>
                     `).join('');
@@ -377,11 +361,38 @@ window.onload = function () {
         }
 
         function EditProduct(id) {
-            fetch(`https://ims-backend-au40.onrender.com/AdminDashboard/products/${id}`, {
-                method: "PUT"
-            })
-            .then(() => loadProducts());
-        }
+                    const productName = document.getElementById("ProductName").value;
+                    const price = document.getElementById("ProductPrice").value;
+                    const stock = document.getElementById("ProductQuantity").value;
+                    const category = document.getElementById("ProductCategory").value;
+
+                    fetch(`https://ims-backend-au40.onrender.com/AdminDashboard/products/${id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            managerId: managerId,
+                            sellerId: sellerId,
+                            productId: productId,
+                            quantity: quantity
+                        })
+                    })
+                    .then(async response => {
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            alert("Stock Edited successfully!");
+                            closeRequestModal();
+                        } else {
+                            alert(data.message || "Failed to create stock request");
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert("Could not connect to backend");
+                    });
+                }
 window.onload = function () {
     showSection('product');
     loadProducts();
@@ -476,7 +487,7 @@ function changePassword(e) {
                 alert("Could not connect to backend");
             });
         }
-          function openRequestModal() {
+          function openRequestModal(id) {
                     document.getElementById("requestModal").style.display = "block";
                 }
 
