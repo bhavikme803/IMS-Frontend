@@ -169,6 +169,25 @@
         </ul>
     </nav>
 
+    <div id="requestModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);">
+    <div style="background:white; width:350px; margin:100px auto; padding:20px; border-radius:10px;">
+        <h2>Create Stock Request</h2>
+        <br>
+
+        <input type="number" id="sellerId" placeholder="Seller ID">
+        <br><br>
+
+        <input type="number" id="productId" placeholder="Product ID">
+        <br><br>
+
+        <input type="number" id="requestQuantity" placeholder="Quantity">
+        <br><br>
+
+        <button onclick="createStockRequest()">Send Request</button>
+        <button onclick="closeRequestModal()">Cancel</button>
+    </div>
+        </div>
+
     <main class="main">
         <h1 id="welcome">Welcome</h1>
         <br>
@@ -176,7 +195,11 @@
         <div id="product" class="section active">
             <h2>Product Management</h2>
             <br>
-            <button type="button" onclick="loadProducts()">Refresh Products</button>
+            <button type="button" onclick="loadProducts()">Refresh Products</button><br>
+            <br>
+            <button type="button" onclick="openRequestModal()">
+                Create Stock Request
+            </button>
 
             <div class="search-box">
                 <input type="text" id="searchProduct" placeholder="Search product by name..." oninput="filterProducts()">
@@ -216,6 +239,9 @@
                 <p><strong>Phone:</strong> <span id="custPhone"></span></p>
                 <br>
                 <button onclick="editProfile()">Edit Profile</button>
+                <br>
+                <br>
+            <button onclick="window.open('ManagerLogin.html','_self')">Logout</button><br>
             </div>
         </div>
     </main>
@@ -387,6 +413,48 @@
             showSection("product");
             loadProfile();
         };
+
+                        function openRequestModal() {
+                    document.getElementById("requestModal").style.display = "block";
+                }
+
+                function closeRequestModal() {
+                    document.getElementById("requestModal").style.display = "none";
+                }
+
+                function createStockRequest() {
+                    const sellerId = document.getElementById("sellerId").value;
+                    const productId = document.getElementById("productId").value;
+                    const quantity = document.getElementById("requestQuantity").value;
+                    const managerId = localStorage.getItem("managerId");
+
+                    fetch("https://ims-backend-au40.onrender.com/manager/createStockRequest", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            managerId: managerId,
+                            sellerId: sellerId,
+                            productId: productId,
+                            quantity: quantity
+                        })
+                    })
+                    .then(async response => {
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            alert("Stock request created successfully!");
+                            closeRequestModal();
+                        } else {
+                            alert(data.message || "Failed to create stock request");
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert("Could not connect to backend");
+                    });
+                }
     </script>
 </body>
 </html>
