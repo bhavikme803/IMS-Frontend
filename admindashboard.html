@@ -45,16 +45,16 @@
         <h2>Edit Product</h2>
         <br>
 
-        <input type="text" id="ProductName" placeholder="Product Name">
+        <input type="text" id="ProductName" placeholder="Product Name" required>
         <br><br>
 
-        <input type="number" id="ProductPrice" placeholder="Price">
+        <input type="number" id="ProductPrice" placeholder="Price" required>
         <br><br>
 
-        <input type="number" id="ProductQuantity" placeholder="Stock">
+        <input type="number" id="ProductQuantity" placeholder="Stock" required>
         <br><br>
 
-        <input type="text" id="ProductCategory" placeholder="Category">
+        <input type="text" id="ProductCategory" placeholder="Category" required>
         <br><br>
 
         <button onclick="EditProduct(id)">Edit Product</button>
@@ -394,6 +394,7 @@ window.onload = function () {
                         console.error(error);
                         alert("Could not connect to backend");
                     });
+                    loadProducts();
                 }
 window.onload = function () {
     showSection('product');
